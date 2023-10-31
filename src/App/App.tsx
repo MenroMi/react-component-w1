@@ -1,5 +1,5 @@
 import { Component, ReactNode } from 'react';
-import { Header } from '../components';
+import { Header, Error, ErrorBoundary, RenderError, Main } from '../components';
 
 interface State {
   [x: string]: never;
@@ -15,9 +15,16 @@ class App extends Component<Props, State> {
 
   render = (): ReactNode => {
     return (
-      <>
+      <ErrorBoundary
+        alternativeComponent={
+          <Error>
+            <RenderError />
+          </Error>
+        }
+      >
         <Header />
-      </>
+        <Main />
+      </ErrorBoundary>
     );
   };
 }
