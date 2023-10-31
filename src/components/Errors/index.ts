@@ -1,3 +1,5 @@
 import Error from './Error';
 import ErrorBoundary from './ErrorBoundary';
-export { Error, ErrorBoundary };
+import { RenderError, BadSearchRequestError } from './ErrorTemplates';
+
+export { Error, ErrorBoundary, RenderError, BadSearchRequestError };
