@@ -1,6 +1,7 @@
 import { Component } from 'react';
 import { Box } from '../shared';
 import styles from './Header.module.css';
+import SearchBar from '../SearchBar';
 
 interface HeaderState {
   [x: string]: never;
@@ -16,7 +17,11 @@ class Header extends Component<HeaderProps, HeaderState> {
   }
 
   render = (): React.ReactNode => {
-    return <Box className={styles['header-box']}>will be search bar</Box>;
+    return (
+      <Box className={styles['header-box']}>
+        <SearchBar />
+      </Box>
+    );
   };
 }
 
