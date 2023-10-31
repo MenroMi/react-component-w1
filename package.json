@@ -12,6 +12,9 @@
     "prepare": "husky install",
     "refactor": "npm run lint && npm run format:fix"
   },
+  "husky": {
+    "pre-commit": "npm run refactor"
+  },
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
