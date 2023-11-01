@@ -1,7 +1,7 @@
 import { Component } from 'react';
 import { Box } from '../../shared';
 import { SadFaceIcon } from '../../Icons';
-import { LOCAL_STORAGE_TERM } from '../../../constants';
+import { HOMEPAGE_URL, LOCAL_STORAGE_TERM } from '../../../constants';
 import styles from './Error.module.css';
 
 interface IErrorProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -33,7 +33,7 @@ class Error extends Component<IErrorProps, IErrorStates> {
         <SadFaceIcon />
         {children}
         <a
-          href="/"
+          href={HOMEPAGE_URL}
           className={styles['error__btn']}
           onClick={this.onReloadPage}
         >
