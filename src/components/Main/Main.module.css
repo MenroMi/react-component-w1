@@ -6,3 +6,10 @@
   box-shadow: 0 0.125rem 2px rgba(0, 0, 0, 0.1);
   min-height: 21.375rem;
 }
+
+@media (max-width: 768px) {
+  .main-box {
+    padding: 1rem;
+    min-height: 18.063rem;
+  }
+}

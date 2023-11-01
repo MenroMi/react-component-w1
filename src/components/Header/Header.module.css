@@ -1,10 +1,16 @@
 .header-box {
-  height: 5rem;
-  padding: 4rem;
+  min-height: 5rem;
+  padding: 2rem 4rem;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 0.125rem 2px rgba(0, 0, 0, 0.1);
   border-radius: 0.3rem;
   background-color: var(--clr-bgc);
+}
+
+@media (max-width: 768px) {
+  .header-box {
+    padding: 1rem;
+  }
 }

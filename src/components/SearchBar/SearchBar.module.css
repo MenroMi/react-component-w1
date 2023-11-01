@@ -34,6 +34,7 @@
   border: none;
   max-width: 15rem;
   width: 100%;
+  height: 3rem;
   color: var(--clr-white);
   background-color: var(--clr-elems);
   text-transform: uppercase;
@@ -62,4 +63,14 @@
 
 .pokemon-search__input > .err-b:active {
   background-color: #8a2d2d;
+}
+
+@media (max-width: 992px) {
+  .pokemon-search__input {
+    flex-direction: column;
+  }
+
+  .pokemon-search__input > button {
+    max-width: 100%;
+  }
 }
