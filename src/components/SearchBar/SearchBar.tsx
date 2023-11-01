@@ -7,6 +7,7 @@ import { IExtendedPokemonContext } from '../../types/contextTypes';
 
 interface SearchBarState {
   term: string;
+  error: boolean;
 }
 
 interface SearchBarProps {
@@ -18,6 +19,7 @@ class SearchBar extends Component<SearchBarProps, SearchBarState> {
     super(props);
     this.state = {
       term: '',
+      error: false,
     };
   }
 
@@ -56,7 +58,13 @@ class SearchBar extends Component<SearchBarProps, SearchBarState> {
     this.setState({ term: target.value });
   };
 
+  errorBoundaryHandler = () => this.setState(() => ({ error: true }));
+
   render = (): React.ReactNode => {
+    if (this.state.error) {
+      throw new Error();
+    }
+
     return (
       <form
         className={styles['pokemon-search']}
@@ -80,6 +88,13 @@ class SearchBar extends Component<SearchBarProps, SearchBarState> {
             value={this.state.term}
           />
           <button type="submit">Search</button>
+          <button
+            type="button"
+            className={styles['err-b']}
+            onClick={this.errorBoundaryHandler}
+          >
+            Error
+          </button>
         </Box>
       </form>
     );

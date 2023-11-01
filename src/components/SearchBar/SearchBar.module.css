@@ -51,3 +51,15 @@
 .pokemon-search__input > button:active {
   background-color: var(--clr-elems-active);
 }
+
+.pokemon-search__input > .err-b {
+  background-color: #f75757;
+}
+
+.pokemon-search__input > .err-b:hover {
+  background-color: #d74646;
+}
+
+.pokemon-search__input > .err-b:active {
+  background-color: #8a2d2d;
+}
