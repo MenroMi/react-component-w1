@@ -1,13 +1,9 @@
-import { Component } from 'react';
+import { FC } from 'react';
 import { Box } from '../shared';
 import styles from './Card.module.css';
 import { IAbility, IStats, IType } from '../../types/pokemonTypes';
 
-interface CardState {
-  [x: string]: never;
-}
-
-interface CardProps {
+interface ICardProps {
   id: number;
   name: string;
   abilities: IAbility[];
@@ -15,12 +11,8 @@ interface CardProps {
   stats: IStats[];
 }
 
-class Card extends Component<CardProps, CardState> {
-  constructor(props: CardProps) {
-    super(props);
-  }
-
-  public onIterateFields = (
+const Card: FC<ICardProps> = ({ abilities, id, name, stats, types }) => {
+  const onIterateFields = (
     fields: (IAbility[] | IType[] | IStats[])[],
     names: string[]
   ): JSX.Element[] => {
@@ -48,23 +40,19 @@ class Card extends Component<CardProps, CardState> {
     });
   };
 
-  render = (): React.ReactNode => {
-    const { abilities, id, name, stats, types } = this.props;
+  const pokemonFieldName = ['ability', 'stat', 'type'];
+  const pokemonFieldValues = [abilities, stats, types];
 
-    const pokemonFieldName = ['ability', 'stat', 'type'];
-    const pokemonFieldValues = [abilities, stats, types];
+  return (
+    <Box className={styles.card}>
+      <p className={styles['card__id']}>{id}</p>
+      <p className={styles['card__name']}>{name}</p>
 
-    return (
-      <Box className={styles.card}>
-        <p className={styles['card__id']}>{id}</p>
-        <p className={styles['card__name']}>{name}</p>
-
-        <ul className={styles['card__info']}>
-          {this.onIterateFields(pokemonFieldValues, pokemonFieldName)}
-        </ul>
-      </Box>
-    );
-  };
-}
+      <ul className={styles['card__info']}>
+        {onIterateFields(pokemonFieldValues, pokemonFieldName)}
+      </ul>
+    </Box>
+  );
+};
 
 export default Card;

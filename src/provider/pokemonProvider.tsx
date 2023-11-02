@@ -1,53 +1,34 @@
-import { Component, createContext } from 'react';
+import { FC, useReducer, useState } from 'react';
 import PokemonService from '../services';
-import {
-  ContextProps,
-  ContextState,
-  IExtendedPokemonContext,
-} from '../types/contextTypes';
 import { LOCAL_STORAGE_TERM } from '../constants';
+import PokemonContext from './contex';
+import { IPokemon } from '../types/pokemonTypes';
+import { initialObjectReducer, reducer } from './contextReducer';
 
-export const PokemonContext = createContext<IExtendedPokemonContext>({
-  getPokemonList: () => new Promise(() => {}),
-  getPokemon: () => new Promise(() => {}),
-  localStorageHandler: () => {},
-  searchPokemon: '',
-  pokemonList: [],
-  isLoading: false,
-  isFetched: false,
-  isError: false,
-  error: {
-    name: '',
-    message: '',
-  },
-});
+export interface IContextProps {
+  children: React.ReactNode;
+}
 
-class PokemonProvider extends Component<ContextProps, ContextState> {
-  constructor(props: ContextProps) {
-    super(props);
+const PokemonProvider: FC<IContextProps> = ({ children }) => {
+  const [{ error, isError, isFetched, isLoading }, dispatch] = useReducer(
+    reducer,
+    initialObjectReducer
+  );
+  const [searchPokemon, setSearchPokemon] = useState<string>('');
+  const [pokemonList, setPokemonList] = useState<IPokemon[]>([]);
+  const pokemonService = new PokemonService();
 
-    this.state = {
-      searchPokemon: '',
-      pokemonList: [],
-      isLoading: false,
-      isFetched: false,
-      isError: false,
-      error: {
-        name: '',
-        message: '',
-      },
-    };
-  }
+  const onLoading = () => dispatch({ type: 'loading' });
+  const onLoaded = () => dispatch({ type: 'fetched' });
+  const onError = (error: Error) => dispatch({ type: 'error', payload: error });
 
-  pokemonService = new PokemonService();
-
-  localStorageHandler = (newTerm?: string): string | null | void => {
+  const localStorageHandler = (newTerm?: string): string | null | void => {
     const prevTerm = localStorage.getItem(LOCAL_STORAGE_TERM);
 
     if (!prevTerm && !newTerm) return null;
 
     if (!prevTerm && newTerm) {
-      this.setState({ searchPokemon: newTerm });
+      setSearchPokemon(newTerm);
       localStorage.setItem(LOCAL_STORAGE_TERM, newTerm);
       return;
     }
@@ -61,76 +42,49 @@ class PokemonProvider extends Component<ContextProps, ContextState> {
     return prevTerm;
   };
 
-  onLoading = () =>
-    this.setState(() => ({
-      isLoading: true,
-      isError: false,
-      isFetched: false,
-      error: { name: '', message: '' },
-    }));
-
-  onLoaded = () =>
-    this.setState(() => ({
-      isLoading: false,
-      isError: false,
-      isFetched: true,
-    }));
-
-  onError = (error: Error) =>
-    this.setState({
-      isLoading: false,
-      isError: true,
-      isFetched: false,
-      error,
-    });
-
-  getPokemonList = async () => {
-    this.onLoading();
-    const pokemons = await this.pokemonService.getPokemons();
+  const getPokemonList = async () => {
+    onLoading();
+    const pokemons = await pokemonService.getPokemons();
     if (pokemons instanceof Error) {
-      this.onError(pokemons);
+      onError(pokemons);
       return;
     }
 
     localStorage.removeItem(LOCAL_STORAGE_TERM);
-    this.setState({ pokemonList: pokemons });
-    this.onLoaded();
+    setPokemonList(pokemons);
+    onLoaded();
   };
 
-  getPokemon = async (name: string) => {
-    this.onLoading();
-    const pokemon = await this.pokemonService.getPokemon(name);
+  const getPokemon = async (name: string) => {
+    onLoading();
+    const pokemon = await pokemonService.getPokemon(name);
 
     if (pokemon instanceof Error) {
-      this.onError(pokemon);
+      onError(pokemon);
       return;
     }
 
-    this.setState({ pokemonList: [pokemon] });
-    this.onLoaded();
+    setPokemonList([pokemon]);
+    onLoaded();
   };
 
-  render = (): React.ReactNode => {
-    const { error, isError, isFetched, isLoading, pokemonList, searchPokemon } =
-      this.state;
-    return (
-      <PokemonContext.Provider
-        value={{
-          getPokemonList: this.getPokemonList,
-          getPokemon: this.getPokemon,
-          localStorageHandler: this.localStorageHandler,
-          searchPokemon,
-          pokemonList,
-          isError,
-          isFetched,
-          isLoading,
-          error,
-        }}
-      >
-        {this.props.children}
-      </PokemonContext.Provider>
-    );
-  };
-}
+  return (
+    <PokemonContext.Provider
+      value={{
+        getPokemonList,
+        getPokemon,
+        localStorageHandler,
+        searchPokemon,
+        pokemonList,
+        isError,
+        isFetched,
+        isLoading,
+        error,
+      }}
+    >
+      {children}
+    </PokemonContext.Provider>
+  );
+};
 
 export default PokemonProvider;

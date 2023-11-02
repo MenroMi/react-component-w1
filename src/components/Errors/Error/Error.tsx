@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { FC } from 'react';
 import { Box } from '../../shared';
 import { SadFaceIcon } from '../../Icons';
 import { HOMEPAGE_URL, LOCAL_STORAGE_TERM } from '../../../constants';
@@ -8,16 +8,8 @@ interface IErrorProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
 }
 
-interface IErrorStates {
-  [x: string]: never;
-}
-
-class Error extends Component<IErrorProps, IErrorStates> {
-  constructor(props: IErrorProps) {
-    super(props);
-  }
-
-  onReloadPage = () => {
+const Error: FC<IErrorProps> = ({ children }) => {
+  const onReloadPage = () => {
     const isExist = localStorage.getItem(LOCAL_STORAGE_TERM);
 
     if (isExist) {
@@ -25,23 +17,19 @@ class Error extends Component<IErrorProps, IErrorStates> {
     }
   };
 
-  render = (): React.ReactNode => {
-    const { children } = this.props;
-
-    return (
-      <Box className={styles.error}>
-        <SadFaceIcon />
-        {children}
-        <a
-          href={HOMEPAGE_URL}
-          className={styles['error__btn']}
-          onClick={this.onReloadPage}
-        >
-          Reload Page
-        </a>
-      </Box>
-    );
-  };
-}
+  return (
+    <Box className={styles.error}>
+      <SadFaceIcon />
+      {children}
+      <a
+        href={HOMEPAGE_URL}
+        className={styles['error__btn']}
+        onClick={onReloadPage}
+      >
+        Reload Page
+      </a>
+    </Box>
+  );
+};
 
 export default Error;
