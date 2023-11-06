@@ -1,7 +1,7 @@
 import styles from './Box.module.css';
 
 interface IBoxProps extends React.HTMLAttributes<HTMLDivElement> {
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 const Box = ({ children, className, ...rest }: IBoxProps) => {

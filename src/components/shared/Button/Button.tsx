@@ -2,11 +2,17 @@ import styles from './Button.module.css';
 
 interface IButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
+  disabled?: boolean;
+  type?: 'button' | 'submit' | 'reset';
 }
 
-const Button = ({ children, className, ...rest }: IButtonProps) => {
+const Button = ({ children, className, type, ...rest }: IButtonProps) => {
   return (
-    <button className={className || styles.button} {...rest}>
+    <button
+      type={type || 'button'}
+      className={`${styles.button} ` + className}
+      {...rest}
+    >
       {children}
     </button>
   );

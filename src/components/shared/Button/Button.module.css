@@ -1,0 +1,21 @@
+.button {
+  border: none;
+  cursor: pointer;
+  border-radius: 0.25rem;
+  text-transform: uppercase;
+  background-color: var(--clr-elems);
+  color: var(--clr-white);
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.button:disabled:hover {
+  background-color: var(--clr-elems);
+}
+
+.button:disabled:active {
+  background-color: var(--clr-elems);
+}
