@@ -7,12 +7,29 @@ export interface IStateAPIStates {
   error: Error;
 }
 
-export interface IPokemonContext extends IStateAPIStates {
-  searchPokemon: string;
+export interface IPaginationStates {
+  limit: number;
+  offset: number;
+  totalCountPages: number;
+  actualPage: number;
+  nextPage: number;
+  prevPage: number;
+  onChangeActualPage: (page: number) => void;
+  onDecrementActualPage: () => void;
+  onIncrementActualPage: () => void;
+  onChangeLimitOnPage: (limit: number) => void;
+}
+
+export interface IPokemonContext extends IStateAPIStates, IPaginationStates {
+  pokemon: IPokemon | null;
   pokemonList: IPokemon[];
+  onSetChosenPokemon: (p: IPokemon | null) => void;
   getPokemonList: () => Promise<void>;
   getPokemon: (name: string) => Promise<void>;
-  localStorageHandler: (newTerm?: string) => string | null | void;
+  onHandleLocalStorage: (newTerm?: string) => string | null | void;
+  onLoaded: () => void;
+  onError: (error: Error) => void;
+  onLoading: () => void;
 }
 
 export interface IErrorStateAPIReducer {
@@ -23,4 +40,9 @@ export interface IErrorStateAPIReducer {
 export interface IStateAPIActions {
   type: string;
   payload?: unknown;
+}
+
+export interface IResponseObject {
+  total: number;
+  pokemons: IPokemon[];
 }
