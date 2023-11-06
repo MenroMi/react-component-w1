@@ -1,10 +1,10 @@
-import {Box} from '../shared';
+import { Box } from '../shared';
 import Cards from '../Cards';
 import Loader from '../Loader';
-import {BadSearchRequestError, Error} from '../Errors';
+import { BadSearchRequestError, Error } from '../Errors';
 import styles from './Main.module.css';
-import {usePokemonsContext} from '../../provider/pokemonProvider';
-import {Outlet} from 'react-router-dom';
+import { usePokemonsContext } from '../../provider/pokemonProvider';
+import { Outlet } from 'react-router-dom';
 
 const Main = () => {
   const {
