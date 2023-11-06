@@ -1,21 +1,37 @@
-import { useContext } from 'react';
-import PokemonContext from '../../provider/contex';
-import { Box } from '../shared';
+import {Box} from '../shared';
 import Cards from '../Cards';
 import Loader from '../Loader';
-import { BadSearchRequestError, Error } from '../Errors';
+import {BadSearchRequestError, Error} from '../Errors';
 import styles from './Main.module.css';
+import {usePokemonsContext} from '../../provider/pokemonProvider';
+import {Outlet} from 'react-router-dom';
 
 const Main = () => {
-  const { isError, isFetched, isLoading, pokemonList } =
-    useContext(PokemonContext);
+  const {
+    pokemon,
+    isError,
+    isFetched,
+    isLoading,
+    pokemonList,
+    onSetChosenPokemon,
+  } = usePokemonsContext();
 
   return (
-    <Box className={styles['main-box']}>
+    <Box
+      className={`${styles['main-box']} ${
+        !!pokemon && styles['main-box-changed']
+      }`}
+    >
       {isLoading && !isError && !isFetched && (
         <>
-          <Loader />
-          {pokemonList.length && <Cards />}
+          <Loader className={styles.loader} />
+          {pokemonList.length && (
+            <Cards
+              pokemonList={pokemonList}
+              onSetChosenPokemon={onSetChosenPokemon}
+              pokemon={pokemon}
+            />
+          )}
         </>
       )}
       {!isLoading && isError && !isFetched && (
@@ -23,7 +39,15 @@ const Main = () => {
           <BadSearchRequestError />
         </Error>
       )}
-      {!isLoading && !isError && isFetched && <Cards />}
+      {!isLoading && !isError && isFetched && (
+        <Cards
+          pokemonList={pokemonList}
+          onSetChosenPokemon={onSetChosenPokemon}
+          pokemon={pokemon}
+        />
+      )}
+
+      <Outlet />
     </Box>
   );
 };
