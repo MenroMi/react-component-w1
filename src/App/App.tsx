@@ -1,18 +1,24 @@
-import { Header, Error, ErrorBoundary, RenderError, Main } from '../components';
+import {
+  Route,
+  RouterProvider,
+  createBrowserRouter,
+  createRoutesFromElements,
+} from 'react-router-dom';
+import { Details, Main } from '../components';
+import Home from '../pages/Home';
+
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route path="/" element={<Home />}>
+      <Route path="/" element={<Main />}>
+        <Route index element={<Details />} />
+      </Route>
+    </Route>
+  )
+);
 
 const App = () => {
-  return (
-    <ErrorBoundary
-      alternativeComponent={
-        <Error>
-          <RenderError />
-        </Error>
-      }
-    >
-      <Header />
-      <Main />
-    </ErrorBoundary>
-  );
+  return <RouterProvider router={router} />;
 };
 
 export default App;
