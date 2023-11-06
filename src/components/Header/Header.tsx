@@ -4,7 +4,7 @@ import SearchBar from '../SearchBar';
 
 const Header = () => {
   return (
-    <Box className={styles['header-box']}>
+    <Box className={`container ${styles['header-box']}`}>
       <SearchBar />
     </Box>
   );
