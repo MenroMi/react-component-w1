@@ -1,0 +1,35 @@
+.pages {
+  height: inherit;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  max-width: 18.75rem;
+  width: 100%;
+}
+
+.pages > * {
+  height: inherit;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 1.75rem;
+  transition: all 100ms ease-in-out;
+}
+
+.pages > input {
+  border: 0.1rem solid var(--clr-white);
+  max-width: 6.25rem;
+  text-align: center;
+  cursor: pointer;
+}
+
+.pages > div {
+  font-size: 1.1rem;
+  opacity: 40%;
+  max-width: 5rem;
+  cursor: default;
+}

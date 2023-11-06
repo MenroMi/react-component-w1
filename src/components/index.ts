@@ -8,6 +8,7 @@ import {
   ErrorBoundary,
   RenderError,
 } from './Errors';
+import Pagination from './Pagination';
 
 export {
   Header,
@@ -18,4 +19,5 @@ export {
   BadSearchRequestError,
   ErrorBoundary,
   RenderError,
+  Pagination,
 };
