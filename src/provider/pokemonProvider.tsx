@@ -1,57 +1,65 @@
-import { FC, useReducer, useState } from 'react';
-import PokemonService from '../services';
-import { LOCAL_STORAGE_TERM } from '../constants';
+import { FC, useContext, useEffect, useState } from 'react';
 import PokemonContext from './contex';
+import onHandleLocalStorage from '../helpers/onHandleLocalStorage';
+import useStatesQuery from '../hooks/useStatesQuery';
+import usePagination from '../hooks/usePagination';
 import { IPokemon } from '../types/pokemonTypes';
-import { initialObjectReducer, reducer } from './contextReducer';
+import { LOCAL_STORAGE_TERM, urlParams } from '../constants';
+import pokemonService from '../services/pokemonService';
+import { IResponseObject } from '../types/contextTypes';
+import onChangeURLParams from '../helpers/onChangeURLParams';
 
 export interface IContextProps {
   children: React.ReactNode;
 }
 
 const PokemonProvider: FC<IContextProps> = ({ children }) => {
-  const [{ error, isError, isFetched, isLoading }, dispatch] = useReducer(
-    reducer,
-    initialObjectReducer
-  );
-  const [searchPokemon, setSearchPokemon] = useState<string>('');
+  const { error, isError, isFetched, isLoading, onError, onLoaded, onLoading } =
+    useStatesQuery();
   const [pokemonList, setPokemonList] = useState<IPokemon[]>([]);
-  const pokemonService = new PokemonService();
+  const [pokemon, setPokemon] = useState<IPokemon | null>(null);
+  const {
+    limit,
+    offset,
+    nextPage,
+    prevPage,
+    actualPage,
+    totalCountPages,
+    onSetTotalPages,
+    onChangeActualPage,
+    onChangeLimitOnPage,
+    onDecrementActualPage,
+    onIncrementActualPage,
+  } = usePagination();
 
-  const onLoading = () => dispatch({ type: 'loading' });
-  const onLoaded = () => dispatch({ type: 'fetched' });
-  const onError = (error: Error) => dispatch({ type: 'error', payload: error });
+  useEffect(() => {
+    const isExistTerm = onHandleLocalStorage();
 
-  const localStorageHandler = (newTerm?: string): string | null | void => {
-    const prevTerm = localStorage.getItem(LOCAL_STORAGE_TERM);
-
-    if (!prevTerm && !newTerm) return null;
-
-    if (!prevTerm && newTerm) {
-      setSearchPokemon(newTerm);
-      localStorage.setItem(LOCAL_STORAGE_TERM, newTerm);
-      return;
+    if (isExistTerm) {
+      getPokemon(isExistTerm);
+    }
+    if (!isExistTerm) {
+      getPokemonList(offset, limit);
     }
 
-    if (prevTerm && newTerm) {
-      localStorage.removeItem(prevTerm);
-      localStorage.setItem(LOCAL_STORAGE_TERM, newTerm);
-      return;
-    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [actualPage, limit]);
 
-    return prevTerm;
-  };
-
-  const getPokemonList = async () => {
+  const getPokemonList = async (offset = 0, limit = 9) => {
     onLoading();
-    const pokemons = await pokemonService.getPokemons();
-    if (pokemons instanceof Error) {
-      onError(pokemons);
+    const response: IResponseObject = await pokemonService.getPokemons(
+      offset,
+      limit
+    );
+
+    if (response instanceof Error) {
+      onError(response);
       return;
     }
 
     localStorage.removeItem(LOCAL_STORAGE_TERM);
-    setPokemonList(pokemons);
+    setPokemonList(response.pokemons);
+    onSetTotalPages(Math.ceil(response.total / limit));
     onLoaded();
   };
 
@@ -65,21 +73,49 @@ const PokemonProvider: FC<IContextProps> = ({ children }) => {
     }
 
     setPokemonList([pokemon]);
+    onSetTotalPages(Math.ceil([pokemon].length / limit));
     onLoaded();
+  };
+
+  const onSetChosenPokemon = (p: IPokemon | null) => {
+    if (!p) {
+      urlParams.details = 0;
+      setPokemon(null);
+      onChangeURLParams(urlParams);
+      return;
+    }
+
+    urlParams.details = p.id;
+    setPokemon(p);
+    onChangeURLParams(urlParams);
   };
 
   return (
     <PokemonContext.Provider
       value={{
-        getPokemonList,
-        getPokemon,
-        localStorageHandler,
-        searchPokemon,
-        pokemonList,
-        isError,
-        isFetched,
-        isLoading,
+        limit,
         error,
+        offset,
+        pokemon,
+        isError,
+        nextPage,
+        prevPage,
+        isLoading,
+        isFetched,
+        actualPage,
+        pokemonList,
+        totalCountPages,
+        onError,
+        onLoaded,
+        onLoading,
+        getPokemon,
+        getPokemonList,
+        onChangeActualPage,
+        onSetChosenPokemon,
+        onChangeLimitOnPage,
+        onHandleLocalStorage,
+        onDecrementActualPage,
+        onIncrementActualPage,
       }}
     >
       {children}
@@ -88,3 +124,5 @@ const PokemonProvider: FC<IContextProps> = ({ children }) => {
 };
 
 export default PokemonProvider;
+
+export const usePokemonsContext = () => useContext(PokemonContext);
