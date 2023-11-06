@@ -1,24 +1,51 @@
-import { useContext } from 'react';
 import Card from '../Card';
 import { Box } from '../shared';
 import styles from './Cards.module.css';
-import PokemonContext from '../../provider/contex';
+import { IPokemon } from '../../types/pokemonTypes';
+import { useEffect, useState } from 'react';
 
-const Cards = () => {
-  const { pokemonList } = useContext(PokemonContext);
+interface ICardsProps {
+  pokemon: IPokemon | null;
+  pokemonList: IPokemon[];
+  onSetChosenPokemon: (p: IPokemon | null) => void;
+}
+
+const Cards = ({ pokemon, pokemonList, onSetChosenPokemon }: ICardsProps) => {
+  const [activeId, setActiveId] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!pokemon) {
+      setActiveId(null);
+    }
+  }, [pokemon]);
+
+  const handleClickShowMore = (inputPokemonData: IPokemon) => {
+    if (activeId && activeId === inputPokemonData.id) {
+      onSetChosenPokemon(null);
+      onSetActiveState(null);
+    } else {
+      onSetChosenPokemon(inputPokemonData);
+      onSetActiveState(inputPokemonData.id);
+    }
+  };
+
+  const onSetActiveState = (id: number | null) => setActiveId(id);
+
+  const cards = pokemonList.map(({ id, ...props }) => (
+    <Card
+      key={id}
+      id={id}
+      {...props}
+      handleClickShowMore={handleClickShowMore}
+      isActive={id === activeId}
+    />
+  ));
 
   return (
-    <Box className={styles['cards-box']}>
-      {pokemonList.map(({ abilities, id, name, stats, types }) => (
-        <Card
-          key={id}
-          id={id}
-          abilities={abilities}
-          name={name}
-          stats={stats}
-          types={types}
-        />
-      ))}
+    <Box
+      className={`${styles['cards-box']} ${activeId && styles['cards-hidden']}`}
+    >
+      {...cards}
     </Box>
   );
 };
