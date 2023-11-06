@@ -1,38 +1,38 @@
-import { useContext, useEffect, useState } from 'react';
-import { Box } from '../shared';
+import { useState } from 'react';
+import { Box, Button, Input } from '../shared';
 import { LOCAL_STORAGE_TERM } from '../../constants';
 import styles from './SearchBar.module.css';
-import PokemonContext from '../../provider/contex';
+import onHandleLocalStorage from '../../helpers/onHandleLocalStorage';
+import { usePokemonsContext } from '../../provider/pokemonProvider';
 
 const SearchBar = () => {
   const [term, setTerm] = useState<string>('');
   const [isError, setIsError] = useState<boolean>(false);
-  const { getPokemon, getPokemonList, localStorageHandler } =
-    useContext(PokemonContext);
-
-  useEffect(() => {
-    const isExistTerm = localStorageHandler();
-
-    if (isExistTerm) {
-      getPokemon(isExistTerm);
-    } else {
-      getPokemonList();
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const {
+    getPokemonList,
+    getPokemon,
+    onChangeActualPage,
+    onSetChosenPokemon,
+    offset,
+  } = usePokemonsContext();
 
   const formSubmitHandler = (e: React.FormEvent<HTMLFormElement>) => {
+    e.stopPropagation();
     e.preventDefault();
     const trimedTerm = term.trim().toLowerCase();
+    onSetChosenPokemon(null);
 
     if (!trimedTerm) {
-      getPokemonList();
+      if (offset !== 0 || localStorage.getItem(LOCAL_STORAGE_TERM)) {
+        getPokemonList();
+        onChangeActualPage(1);
+      }
+
       return;
     }
 
     getPokemon(trimedTerm);
-    localStorageHandler(trimedTerm);
+    onHandleLocalStorage(trimedTerm);
     setTerm('');
   };
 
@@ -45,9 +45,7 @@ const SearchBar = () => {
 
   const errorBoundaryHandler = () => setIsError(true);
 
-  if (isError) {
-    throw new Error();
-  }
+  if (isError) throw new Error();
 
   return (
     <form className={styles['pokemon-search']} onSubmit={formSubmitHandler}>
@@ -55,7 +53,7 @@ const SearchBar = () => {
         Search bar:
       </label>
       <Box className={styles['pokemon-search__input']}>
-        <input
+        <Input
           id="term"
           type="text"
           placeholder={
@@ -68,14 +66,16 @@ const SearchBar = () => {
           onChange={inputChangeHandler}
           value={term}
         />
-        <button type="submit">Search</button>
-        <button
+        <Button className="btn-elem" type="submit">
+          Search
+        </Button>
+        <Button
           type="button"
           className={styles['err-b']}
           onClick={errorBoundaryHandler}
         >
           Error
-        </button>
+        </Button>
       </Box>
     </form>
   );
