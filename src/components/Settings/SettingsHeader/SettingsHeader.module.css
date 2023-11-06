@@ -1,0 +1,26 @@
+.settings__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 100ms ease-in-out;
+  padding-left: 3rem;
+  padding-right: 3rem;
+  text-transform: uppercase;
+  border-radius: 0.3rem;
+}
+
+.settings__header:hover {
+  background-color: rgba(206, 206, 206, 0.2);
+}
+
+.settings__header:active {
+  background-color: rgba(206, 206, 206, 0.5);
+}
+
+@media (max-width: 768px) {
+  .settings__header {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}

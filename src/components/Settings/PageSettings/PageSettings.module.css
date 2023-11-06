@@ -1,0 +1,23 @@
+.settings {
+  margin-top: var(--mt-section);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  row-gap: 3rem;
+}
+
+.settings > * {
+  text-transform: uppercase;
+}
+
+.size {
+  min-height: inherit;
+  align-self: center;
+  grid-column: 4 / 6;
+}
+
+@media (max-width: 992px) {
+  .size {
+    grid-column: 1;
+  }
+}
