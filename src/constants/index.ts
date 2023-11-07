@@ -4,7 +4,7 @@ export const LOCAL_STORAGE_TERM = 'prev-search-term';
 
 export const UNKNOWN = 'unknown';
 
-export const HOMEPAGE_URL = 'https://menromi.github.io/rsschool-menromi-2023/';
+export const HOMEPAGE_URL = 'https://rsschool-menromi-2023.vercel.app/';
 
 export const initialData: IInitialData = {
   actualPage: 1,
