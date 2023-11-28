@@ -11,6 +11,21 @@
   --clr-black: rgb(0, 0, 0);
 
   --clr-fill: rgba(197, 197, 197, 0.366);
+
+  --clr-btn-error: #f75757;
+  --clr-btn-error-hover: #d74646;
+  --clr-btn-error-active: #8a2d2d;
+
+  --clr-btn-secondary: rgba(209, 209, 209, 1);
+  --clr-btn-secondary-hover: rgba(225, 224, 224, 0.4);
+  --clr-btn-secondary-active: rgba(225, 224, 224, 0.55);
+
+  --box-shadow-default: 0 0.125rem 2px rgba(0, 0, 0, 0.1);
+  --box-shadow-card: 0 0.1rem 0.1rem 0 rgba(0, 0, 0, 0.1);
+
+  --box-shadow-inset: inset 8px 10px 19px -25px rgba(66, 68, 90, 1);
+
+  --mt-section: 3rem;
 }
 
 * {
@@ -28,6 +43,27 @@ ol,
 li {
   list-style: none;
   padding-inline-start: 0;
+}
+
+.container {
+  min-height: 5rem;
+  box-shadow: var(--box-shadow-default);
+  border-radius: 0.3rem;
+  background-color: var(--clr-bgc);
+  transition: all 100ms ease-in;
+}
+
+.btn-elem {
+  color: var(--clr-white);
+  background-color: var(--clr-elems);
+}
+
+.btn-elem:hover {
+  background-color: var(--clr-elems-hover);
+}
+
+.btn-elem:active {
+  background-color: var(--clr-elems-active);
 }
 
 @media (max-width: 576px) {

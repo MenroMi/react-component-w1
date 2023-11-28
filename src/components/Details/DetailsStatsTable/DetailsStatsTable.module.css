@@ -1,0 +1,18 @@
+.stat-table {
+  width: 100%;
+  text-align: center;
+  text-transform: capitalize;
+  background-color: var(--clr-bgc);
+  padding: 1rem;
+  -webkit-box-shadow: inset 8px 10px 19px -25px rgba(66, 68, 90, 1);
+  -moz-box-shadow: inset 8px 10px 19px -25px rgba(66, 68, 90, 1);
+  box-shadow: inset 8px 10px 19px -25px rgba(66, 68, 90, 1);
+}
+
+table,
+th,
+td {
+  border: 1px solid black;
+  padding: 0.5rem;
+  border-collapse: collapse;
+}

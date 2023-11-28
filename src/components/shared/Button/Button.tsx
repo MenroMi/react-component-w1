@@ -1,27 +1,21 @@
-import { Component } from 'react';
 import styles from './Button.module.css';
 
 interface IButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
+  disabled?: boolean;
+  type?: 'button' | 'submit' | 'reset';
 }
 
-interface IButtonStates {
-  [x: string]: never;
-}
-
-class Button extends Component<IButtonProps, IButtonStates> {
-  constructor(props: IButtonProps) {
-    super(props);
-  }
-
-  render = (): React.ReactNode => {
-    const { children, className, ...rest } = this.props;
-    return (
-      <button className={className || styles.button} {...rest}>
-        {children}
-      </button>
-    );
-  };
-}
+const Button = ({ children, className, type, ...rest }: IButtonProps) => {
+  return (
+    <button
+      type={type || 'button'}
+      className={`${styles.button} ` + className}
+      {...rest}
+    >
+      {children}
+    </button>
+  );
+};
 
 export default Button;

@@ -1,42 +1,53 @@
-import { Component, Context } from 'react';
-import { PokemonContext } from '../../provider/pokemonProvider';
 import Card from '../Card';
 import { Box } from '../shared';
 import styles from './Cards.module.css';
-import { IExtendedPokemonContext } from '../../types/contextTypes';
+import { IPokemon } from '../../types/pokemonTypes';
+import { useEffect, useState } from 'react';
 
-interface CardsState {
-  [x: string]: never;
+interface ICardsProps {
+  pokemon: IPokemon | null;
+  pokemonList: IPokemon[];
+  onSetChosenPokemon: (p: IPokemon | null) => void;
 }
 
-interface CardsProps {
-  [x: string]: never;
-}
+const Cards = ({ pokemon, pokemonList, onSetChosenPokemon }: ICardsProps) => {
+  const [activeId, setActiveId] = useState<number | null>(null);
 
-class Cards extends Component<CardsProps, CardsState> {
-  constructor(props: CardsProps) {
-    super(props);
-  }
-  static contextType: Context<IExtendedPokemonContext> = PokemonContext;
-  declare context: React.ContextType<typeof PokemonContext>;
+  useEffect(() => {
+    if (!pokemon) {
+      setActiveId(null);
+    }
+  }, [pokemon]);
 
-  render = (): React.ReactNode => {
-    const { pokemonList } = this.context;
-    return (
-      <Box className={styles['cards-box']}>
-        {pokemonList.map(({ abilities, id, name, stats, types }) => (
-          <Card
-            key={id}
-            id={id}
-            abilities={abilities}
-            name={name}
-            stats={stats}
-            types={types}
-          />
-        ))}
-      </Box>
-    );
+  const handleClickShowMore = (inputPokemonData: IPokemon) => {
+    if (activeId && activeId === inputPokemonData.id) {
+      onSetChosenPokemon(null);
+      onSetActiveState(null);
+    } else {
+      onSetChosenPokemon(inputPokemonData);
+      onSetActiveState(inputPokemonData.id);
+    }
   };
-}
+
+  const onSetActiveState = (id: number | null) => setActiveId(id);
+
+  const cards = pokemonList.map(({ id, ...props }) => (
+    <Card
+      key={id}
+      id={id}
+      {...props}
+      handleClickShowMore={handleClickShowMore}
+      isActive={id === activeId}
+    />
+  ));
+
+  return (
+    <Box
+      className={`${styles['cards-box']} ${activeId && styles['cards-hidden']}`}
+    >
+      {...cards}
+    </Box>
+  );
+};
 
 export default Cards;

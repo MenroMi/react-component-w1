@@ -1,136 +1,128 @@
-import { Component, createContext } from 'react';
-import PokemonService from '../services';
-import {
-  ContextProps,
-  ContextState,
-  IExtendedPokemonContext,
-} from '../types/contextTypes';
-import { LOCAL_STORAGE_TERM } from '../constants';
+import { FC, useContext, useEffect, useState } from 'react';
+import PokemonContext from './contex';
+import onHandleLocalStorage from '../helpers/onHandleLocalStorage';
+import useStatesQuery from '../hooks/useStatesQuery';
+import usePagination from '../hooks/usePagination';
+import { IPokemon } from '../types/pokemonTypes';
+import { LOCAL_STORAGE_TERM, urlParams } from '../constants';
+import pokemonService from '../services/pokemonService';
+import { IResponseObject } from '../types/contextTypes';
+import onChangeURLParams from '../helpers/onChangeURLParams';
 
-export const PokemonContext = createContext<IExtendedPokemonContext>({
-  getPokemonList: () => new Promise(() => {}),
-  getPokemon: () => new Promise(() => {}),
-  localStorageHandler: () => {},
-  searchPokemon: '',
-  pokemonList: [],
-  isLoading: false,
-  isFetched: false,
-  isError: false,
-  error: {
-    name: '',
-    message: '',
-  },
-});
+export interface IContextProps {
+  children: React.ReactNode;
+}
 
-class PokemonProvider extends Component<ContextProps, ContextState> {
-  constructor(props: ContextProps) {
-    super(props);
+const PokemonProvider: FC<IContextProps> = ({ children }) => {
+  const { error, isError, isFetched, isLoading, onError, onLoaded, onLoading } =
+    useStatesQuery();
+  const [pokemonList, setPokemonList] = useState<IPokemon[]>([]);
+  const [pokemon, setPokemon] = useState<IPokemon | null>(null);
+  const {
+    limit,
+    offset,
+    nextPage,
+    prevPage,
+    actualPage,
+    totalCountPages,
+    onSetTotalPages,
+    onChangeActualPage,
+    onChangeLimitOnPage,
+    onDecrementActualPage,
+    onIncrementActualPage,
+  } = usePagination();
 
-    this.state = {
-      searchPokemon: '',
-      pokemonList: [],
-      isLoading: false,
-      isFetched: false,
-      isError: false,
-      error: {
-        name: '',
-        message: '',
-      },
-    };
-  }
+  useEffect(() => {
+    const isExistTerm = onHandleLocalStorage();
 
-  pokemonService = new PokemonService();
-
-  localStorageHandler = (newTerm?: string): string | null | void => {
-    const prevTerm = localStorage.getItem(LOCAL_STORAGE_TERM);
-
-    if (!prevTerm && !newTerm) return null;
-
-    if (!prevTerm && newTerm) {
-      this.setState({ searchPokemon: newTerm });
-      localStorage.setItem(LOCAL_STORAGE_TERM, newTerm);
-      return;
+    if (isExistTerm) {
+      getPokemon(isExistTerm);
+    }
+    if (!isExistTerm) {
+      getPokemonList(offset, limit);
     }
 
-    if (prevTerm && newTerm) {
-      localStorage.removeItem(prevTerm);
-      localStorage.setItem(LOCAL_STORAGE_TERM, newTerm);
-      return;
-    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [actualPage, limit]);
 
-    return prevTerm;
-  };
+  const getPokemonList = async (offset = 0, limit = 9) => {
+    onLoading();
+    const response: IResponseObject = await pokemonService.getPokemons(
+      offset,
+      limit
+    );
 
-  onLoading = () =>
-    this.setState(() => ({
-      isLoading: true,
-      isError: false,
-      isFetched: false,
-      error: { name: '', message: '' },
-    }));
-
-  onLoaded = () =>
-    this.setState(() => ({
-      isLoading: false,
-      isError: false,
-      isFetched: true,
-    }));
-
-  onError = (error: Error) =>
-    this.setState({
-      isLoading: false,
-      isError: true,
-      isFetched: false,
-      error,
-    });
-
-  getPokemonList = async () => {
-    this.onLoading();
-    const pokemons = await this.pokemonService.getPokemons();
-    if (pokemons instanceof Error) {
-      this.onError(pokemons);
+    if (response instanceof Error) {
+      onError(response);
       return;
     }
 
     localStorage.removeItem(LOCAL_STORAGE_TERM);
-    this.setState({ pokemonList: pokemons });
-    this.onLoaded();
+    setPokemonList(response.pokemons);
+    onSetTotalPages(Math.ceil(response.total / limit));
+    onLoaded();
   };
 
-  getPokemon = async (name: string) => {
-    this.onLoading();
-    const pokemon = await this.pokemonService.getPokemon(name);
+  const getPokemon = async (name: string) => {
+    onLoading();
+    const pokemon = await pokemonService.getPokemon(name);
 
     if (pokemon instanceof Error) {
-      this.onError(pokemon);
+      onError(pokemon);
       return;
     }
 
-    this.setState({ pokemonList: [pokemon] });
-    this.onLoaded();
+    setPokemonList([pokemon]);
+    onSetTotalPages(Math.ceil([pokemon].length / limit));
+    onLoaded();
   };
 
-  render = (): React.ReactNode => {
-    const { error, isError, isFetched, isLoading, pokemonList, searchPokemon } =
-      this.state;
-    return (
-      <PokemonContext.Provider
-        value={{
-          getPokemonList: this.getPokemonList,
-          getPokemon: this.getPokemon,
-          localStorageHandler: this.localStorageHandler,
-          searchPokemon,
-          pokemonList,
-          isError,
-          isFetched,
-          isLoading,
-          error,
-        }}
-      >
-        {this.props.children}
-      </PokemonContext.Provider>
-    );
+  const onSetChosenPokemon = (p: IPokemon | null) => {
+    if (!p) {
+      urlParams.details = 0;
+      setPokemon(null);
+      onChangeURLParams(urlParams);
+      return;
+    }
+
+    urlParams.details = p.id;
+    setPokemon(p);
+    onChangeURLParams(urlParams);
   };
-}
+
+  return (
+    <PokemonContext.Provider
+      value={{
+        limit,
+        error,
+        offset,
+        pokemon,
+        isError,
+        nextPage,
+        prevPage,
+        isLoading,
+        isFetched,
+        actualPage,
+        pokemonList,
+        totalCountPages,
+        onError,
+        onLoaded,
+        onLoading,
+        getPokemon,
+        getPokemonList,
+        onChangeActualPage,
+        onSetChosenPokemon,
+        onChangeLimitOnPage,
+        onHandleLocalStorage,
+        onDecrementActualPage,
+        onIncrementActualPage,
+      }}
+    >
+      {children}
+    </PokemonContext.Provider>
+  );
+};
 
 export default PokemonProvider;
+
+export const usePokemonsContext = () => useContext(PokemonContext);

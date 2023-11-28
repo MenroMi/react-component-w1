@@ -1,47 +1,55 @@
-import { Component, Context } from 'react';
-import { PokemonContext } from '../../provider/pokemonProvider';
 import { Box } from '../shared';
 import Cards from '../Cards';
 import Loader from '../Loader';
 import { BadSearchRequestError, Error } from '../Errors';
 import styles from './Main.module.css';
-import { IExtendedPokemonContext } from '../../types/contextTypes';
+import { usePokemonsContext } from '../../provider/pokemonProvider';
+import { Outlet } from 'react-router-dom';
 
-interface MainState {
-  [x: string]: never;
-}
+const Main = () => {
+  const {
+    pokemon,
+    isError,
+    isFetched,
+    isLoading,
+    pokemonList,
+    onSetChosenPokemon,
+  } = usePokemonsContext();
 
-interface MainProps {
-  [x: string]: never;
-}
+  return (
+    <Box
+      className={`${styles['main-box']} ${
+        !!pokemon && styles['main-box-changed']
+      }`}
+    >
+      {isLoading && !isError && !isFetched && (
+        <>
+          <Loader className={styles.loader} />
+          {pokemonList.length && (
+            <Cards
+              pokemonList={pokemonList}
+              onSetChosenPokemon={onSetChosenPokemon}
+              pokemon={pokemon}
+            />
+          )}
+        </>
+      )}
+      {!isLoading && isError && !isFetched && (
+        <Error>
+          <BadSearchRequestError />
+        </Error>
+      )}
+      {!isLoading && !isError && isFetched && (
+        <Cards
+          pokemonList={pokemonList}
+          onSetChosenPokemon={onSetChosenPokemon}
+          pokemon={pokemon}
+        />
+      )}
 
-class Main extends Component<MainProps, MainState> {
-  constructor(props: MainProps) {
-    super(props);
-  }
-
-  static contextType: Context<IExtendedPokemonContext> = PokemonContext;
-  declare context: React.ContextType<typeof PokemonContext>;
-
-  render = (): React.ReactNode => {
-    const { isError, isFetched, isLoading, pokemonList } = this.context;
-    return (
-      <Box className={styles['main-box']}>
-        {isLoading && !isError && !isFetched && (
-          <>
-            <Loader />
-            {pokemonList.length && <Cards />}
-          </>
-        )}
-        {!isLoading && isError && !isFetched && (
-          <Error>
-            <BadSearchRequestError />
-          </Error>
-        )}
-        {!isLoading && !isError && isFetched && <Cards />}
-      </Box>
-    );
-  };
-}
+      <Outlet />
+    </Box>
+  );
+};
 
 export default Main;

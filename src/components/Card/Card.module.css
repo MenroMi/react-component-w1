@@ -1,15 +1,25 @@
 .card {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
   position: relative;
-  min-height: 15rem;
-  background-color: white;
+  min-height: 1rem;
+  background-color: var(--clr-white);
   padding: 1rem;
   border-radius: 0.5rem;
-  box-shadow: 0 0.1rem 0.1rem 0 rgba(0, 0, 0, 0.1);
+  box-shadow: var(--box-shadow-card);
+  cursor: pointer;
+  transition: all 200ms ease-in-out;
 }
 
-.card__id {
-  font-weight: 800;
-  font-size: 1.275rem;
+.card:hover {
+  transform: translateY(0.5rem);
+}
+
+.card:active {
+  box-shadow: var(--box-shadow-inset);
+  -webkit-box-shadow: var(--box-shadow-inset);
+  -moz-box-shadow: var(--box-shadow-inset);
 }
 
 .card__name {
@@ -18,14 +28,29 @@
   font-size: 1.3rem;
 }
 
-.card__info {
-  margin-top: 2rem;
+.card__btn {
+  text-align: center;
+  text-transform: uppercase;
+  opacity: 0;
+  color: var(--clr-btn-secondary);
+  background-color: transparent;
+  font-size: 1.3rem;
+  font-weight: 300;
+  padding: 0 0.875rem;
+  transition: all 200ms ease-in-out;
 }
 
-.card__info li:not(:first-child) {
-  margin-top: 0.875rem;
+.card:hover .card__btn {
+  opacity: 1;
 }
 
-.card__info li > span {
-  font-weight: 700;
+.card.card-active {
+  box-shadow: var(--box-shadow-inset);
+  -webkit-box-shadow: var(--box-shadow-inset);
+  -moz-box-shadow: var(--box-shadow-inset);
+  transform: translateY(0.5rem);
+}
+
+.card.card-active .card__btn {
+  opacity: 1;
 }

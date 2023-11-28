@@ -1,0 +1,6 @@
+.input {
+  background-color: var(--clr-input);
+  border: none;
+  border-radius: 0.125rem;
+  outline: none;
+}

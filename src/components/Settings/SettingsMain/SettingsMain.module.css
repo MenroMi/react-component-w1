@@ -1,0 +1,24 @@
+.setttings__container {
+  display: grid;
+  grid-template: 1fr / repeat(5, 1fr);
+  padding-left: 3rem;
+  padding-right: 3rem;
+  transition: all 300ms ease-in;
+}
+
+.closed {
+  display: none;
+}
+
+@media (max-width: 992px) {
+  .setttings__container {
+    grid-template: 1fr / 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .setttings__container {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}

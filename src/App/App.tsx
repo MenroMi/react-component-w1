@@ -1,32 +1,24 @@
-import { Component, ReactNode } from 'react';
-import { Header, Error, ErrorBoundary, RenderError, Main } from '../components';
+import {
+  Route,
+  RouterProvider,
+  createBrowserRouter,
+  createRoutesFromElements,
+} from 'react-router-dom';
+import { Details, Main } from '../components';
+import Home from '../pages/Home';
 
-interface State {
-  [x: string]: never;
-}
-interface Props {
-  [x: string]: never;
-}
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route path="/" element={<Home />}>
+      <Route path="/" element={<Main />}>
+        <Route index element={<Details />} />
+      </Route>
+    </Route>
+  )
+);
 
-class App extends Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-  }
-
-  render = (): ReactNode => {
-    return (
-      <ErrorBoundary
-        alternativeComponent={
-          <Error>
-            <RenderError />
-          </Error>
-        }
-      >
-        <Header />
-        <Main />
-      </ErrorBoundary>
-    );
-  };
-}
+const App = () => {
+  return <RouterProvider router={router} />;
+};
 
 export default App;

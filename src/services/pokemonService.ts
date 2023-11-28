@@ -25,7 +25,7 @@ class PokemonService {
     return await response.json();
   };
 
-  public getPokemons = async (offset = 0, limit = 8) => {
+  public getPokemons = async (offset: number, limit: number) => {
     try {
       const pokemonsPage: IPokemonsPage = await this.getResource(
         `${this.apiBase}/pokemon?offset=${offset}&limit=${limit}`
@@ -48,7 +48,7 @@ class PokemonService {
       const pokemons: IPokemon[] = [];
       for (const res of pokemonsFromPage) pokemons.push(await res.json());
 
-      return pokemons;
+      return { total: pokemonsPage.count, pokemons };
     } catch (error) {
       if (error instanceof Error) {
         console.error(`${error.name} --- ${error.message}`);
@@ -79,4 +79,6 @@ class PokemonService {
   };
 }
 
-export default PokemonService;
+const pokemonService = new PokemonService();
+
+export default pokemonService;

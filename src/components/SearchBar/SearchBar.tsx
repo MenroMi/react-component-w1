@@ -1,104 +1,84 @@
-import { Component, Context } from 'react';
-import { PokemonContext } from '../../provider/pokemonProvider';
-import { Box } from '../shared';
+import { useState } from 'react';
+import { Box, Button, Input } from '../shared';
 import { LOCAL_STORAGE_TERM } from '../../constants';
 import styles from './SearchBar.module.css';
-import { IExtendedPokemonContext } from '../../types/contextTypes';
+import onHandleLocalStorage from '../../helpers/onHandleLocalStorage';
+import { usePokemonsContext } from '../../provider/pokemonProvider';
 
-interface SearchBarState {
-  term: string;
-  error: boolean;
-}
+const SearchBar = () => {
+  const [term, setTerm] = useState<string>('');
+  const [isError, setIsError] = useState<boolean>(false);
+  const {
+    getPokemonList,
+    getPokemon,
+    onChangeActualPage,
+    onSetChosenPokemon,
+    offset,
+  } = usePokemonsContext();
 
-interface SearchBarProps {
-  [x: string]: never;
-}
-
-class SearchBar extends Component<SearchBarProps, SearchBarState> {
-  constructor(props: SearchBarProps) {
-    super(props);
-    this.state = {
-      term: '',
-      error: false,
-    };
-  }
-
-  static contextType: Context<IExtendedPokemonContext> = PokemonContext;
-  declare context: React.ContextType<typeof PokemonContext>;
-
-  componentDidMount(): void {
-    const { getPokemonList, getPokemon, localStorageHandler } = this.context;
-
-    const isExistTerm = localStorageHandler();
-
-    if (!isExistTerm) getPokemonList();
-
-    if (isExistTerm) getPokemon(isExistTerm);
-  }
-
-  formSubmitHandler = (e: React.FormEvent<HTMLFormElement>) => {
+  const formSubmitHandler = (e: React.FormEvent<HTMLFormElement>) => {
+    e.stopPropagation();
     e.preventDefault();
-    const { getPokemon, getPokemonList, localStorageHandler } = this.context;
-    const trimedTerm = this.state.term.trim().toLowerCase();
+    const trimedTerm = term.trim().toLowerCase();
+    onSetChosenPokemon(null);
 
     if (!trimedTerm) {
-      getPokemonList();
+      if (offset !== 0 || localStorage.getItem(LOCAL_STORAGE_TERM)) {
+        getPokemonList();
+        onChangeActualPage(1);
+      }
+
       return;
     }
 
     getPokemon(trimedTerm);
-    localStorageHandler(trimedTerm);
-    this.setState({ term: '' });
+    onHandleLocalStorage(trimedTerm);
+    setTerm('');
   };
 
-  inputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const inputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const target = e.target as HTMLInputElement;
 
     if (/\d|\W/gi.test(target.value)) return;
-    this.setState({ term: target.value });
+    setTerm(target.value);
   };
 
-  errorBoundaryHandler = () => this.setState(() => ({ error: true }));
+  const errorBoundaryHandler = () => setIsError(true);
 
-  render = (): React.ReactNode => {
-    if (this.state.error) {
-      throw new Error();
-    }
+  if (isError) throw new Error();
 
-    return (
-      <form
-        className={styles['pokemon-search']}
-        onSubmit={this.formSubmitHandler}
-      >
-        <label htmlFor="term" className={styles['pokemon-search__label']}>
-          Search bar:
-        </label>
-        <Box className={styles['pokemon-search__input']}>
-          <input
-            id="term"
-            type="text"
-            placeholder={
-              (localStorage.getItem(LOCAL_STORAGE_TERM) &&
-                `The last wanted pokemon: ${localStorage.getItem(
-                  LOCAL_STORAGE_TERM
-                )}`) ||
-              'Write your pokemon...'
-            }
-            onChange={this.inputChangeHandler}
-            value={this.state.term}
-          />
-          <button type="submit">Search</button>
-          <button
-            type="button"
-            className={styles['err-b']}
-            onClick={this.errorBoundaryHandler}
-          >
-            Error
-          </button>
-        </Box>
-      </form>
-    );
-  };
-}
+  return (
+    <form className={styles['pokemon-search']} onSubmit={formSubmitHandler}>
+      <label htmlFor="term" className={styles['pokemon-search__label']}>
+        Search bar:
+      </label>
+      <Box className={styles['pokemon-search__input']}>
+        <Input
+          id="term"
+          type="text"
+          placeholder={
+            (localStorage.getItem(LOCAL_STORAGE_TERM) &&
+              `The last wanted pokemon: ${localStorage.getItem(
+                LOCAL_STORAGE_TERM
+              )}`) ||
+            'Write your pokemon...'
+          }
+          onChange={inputChangeHandler}
+          value={term}
+        />
+        <Button className="btn-elem" type="submit">
+          Search
+        </Button>
+        <Button
+          type="button"
+          className={styles['err-b']}
+          onClick={errorBoundaryHandler}
+        >
+          Error
+        </Button>
+      </Box>
+    </form>
+  );
+};
 
 export default SearchBar;

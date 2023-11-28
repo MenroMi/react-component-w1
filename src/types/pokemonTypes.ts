@@ -21,6 +21,21 @@ export interface IType {
   slot: number;
 }
 
+export interface ISprites {
+  back_default: string | null;
+  back_shiny: string | null;
+  front_default: string;
+}
+
+export interface IMove {
+  name: string;
+  url: string;
+}
+
+export interface IMove {
+  move: IMove;
+}
+
 export interface IPokemon {
   abilities: IAbility[];
   base_experience: number;
@@ -33,4 +48,6 @@ export interface IPokemon {
   stats: IStats[];
   types: IType[];
   weight: number;
+  sprites: ISprites;
+  moves: IMove[];
 }

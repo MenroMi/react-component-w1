@@ -1,10 +1,36 @@
 .main-box {
   position: relative;
-  margin-top: 3rem;
+  margin-top: var(--mt-section);
   background-color: var(--clr-bgc);
   padding: 2rem 4rem;
-  box-shadow: 0 0.125rem 2px rgba(0, 0, 0, 0.1);
-  min-height: 21.375rem;
+  box-shadow: var(--box-shadow-default);
+}
+
+.main-box.main-box-changed {
+  display: flex;
+  gap: 1rem;
+}
+
+.main-box.main-box-changed > *:not(.loader) {
+  width: 50%;
+}
+
+.loader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+
+@media (max-width: 992px) {
+  .main-box.main-box-changed {
+    display: block;
+  }
+
+  .main-box.main-box-changed > *:not(.loader) {
+    width: 100%;
+  }
 }
 
 @media (max-width: 768px) {
